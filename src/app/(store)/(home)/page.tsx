@@ -4,10 +4,10 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const getFeaturedProducts = async (): Promise<Product[]> => {
+async function getFeaturedProducts(): Promise<Product[]> {
   const response = await api('/products/featured', {
     next: {
-      revalidate: 60 * 60,
+      revalidate: 60 * 60, // 1 hour
     },
   })
 
@@ -21,16 +21,16 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
-  const [hightLightedProduct, ...otherProducts] = await getFeaturedProducts()
+  const [highlightedProduct, ...otherProducts] = await getFeaturedProducts()
 
   return (
     <div className="grid max-h-[860px] grid-cols-9 grid-rows-6 gap-6">
       <Link
-        href={`/product/${hightLightedProduct.slug}`}
+        href={`/product/${highlightedProduct.slug}`}
         className="group relative col-span-6 row-span-6 rounded-lg bg-zinc-900 overflow-hidden flex justify-center items-end"
       >
         <Image
-          src={hightLightedProduct.image}
+          src={highlightedProduct.image}
           className="group-hover:scale-105 transition-transform duration-500"
           width={920}
           height={920}
@@ -39,11 +39,13 @@ export default async function Home() {
         />
 
         <div className="absolute bottom-28 right-28 h-12 flex items-center gap-2 max-w-[280px] rounded-full border-2 border-zinc-500 bg-black/60 p-1 pl-5">
-          <span className="text-sm truncate">{hightLightedProduct.title}</span>
+          <span className="text-sm truncate">{highlightedProduct.title}</span>
           <span className="flex h-full items-center justify-center rounded-full bg-violet-500 px-4 font-semibold">
-            {hightLightedProduct.price.toLocaleString('pt-BR', {
+            {highlightedProduct.price.toLocaleString('pt-BR', {
               style: 'currency',
               currency: 'BRL',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             })}
           </span>
         </div>
@@ -71,6 +73,8 @@ export default async function Home() {
                 {product.price.toLocaleString('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
                 })}
               </span>
             </div>
